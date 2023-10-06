@@ -4,28 +4,39 @@ import math
 def random_walk(n):
     position = 0
     above_ox_count = 0
+    above_ox_count_copy = 0
+    under_ox_count = 0
+    under_ox_count_copy = 0
+    sign_changes = 0
+
     for _ in range(n):
-        step = random.choice([-1, 1])
+        step = random.choice([1, -1])
         position += step
         if position > 0:
             above_ox_count += 1
+            above_ox_count_copy = above_ox_count
+        if position < 0:
+            under_ox_count += 1
+            under_ox_count_copy = under_ox_count
 
-    return above_ox_count
+        if (above_ox_count_copy > 0 and under_ox_count_copy > 0):
+            sign_changes += 1
+            above_ox_count_copy = 0
+            under_ox_count_copy = 0
+
+    return above_ox_count, sign_changes
 
 # a) Емпірична ймовірність, що процес був вище ОХ
 n = 100
-above_ox_count = random_walk(n)
+above_ox_count, _ = random_walk(n)
 empirical_prob_a = above_ox_count/n
 
 # a) Теоретична ймовірність, що процес був вище ОХ
 theoretical_prob_a = math.comb(2*n, n)/2**(2*n)
 
-# a) Порівняння теоретичної і емпіричної ймовірностей
-pass
-
 # b) Емпірична ймовірність кількості змін знаку
-# _, sign_changes = random_walk(n)
-# empirical_prob_b = sign_changes / (n - 1)  # n - 1, оскільки не можна враховувати перший крок
+_, sign_changes = random_walk(n)
+empirical_prob_b = sign_changes / n
 
 # c) Оцінка теоретичної ймовірності останнього попадання в 0 до 10, 15, 20, 50 кроку
 def theoretical_prob_last_to_zero(k):
@@ -61,11 +72,10 @@ l_values = [100, 150, 200, 500]
 empirical_probs_c = [random_walk_to_zero(l) for l in l_values]
 
 
-
 # Виведення результатів
 print("a) Емпірична ймовірність, що процес був вище ОХ: {}".format(empirical_prob_a))
 print("a) Теоретична ймовірність, що процес був вище ОХ: {}".format(theoretical_prob_a))
-# print(f"b) Емпірична ймовірність кількості змін знаку: {empirical_prob_b}")
+print("b) Емпірична ймовірність кількості змін знаку: {}".format(empirical_prob_b))
 print("c) Теоретичні ймовірності:")
 for i, k in enumerate(k_values):
     print("    Для k = {}: {}".format(k, theoretical_probs_c[i]))
